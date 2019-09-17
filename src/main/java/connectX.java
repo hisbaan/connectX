@@ -16,14 +16,15 @@ public class connectX {
     private static final String ANSI_YELLOW = "\u001B[33m";
 
     public Scanner sc = new Scanner(System.in);
-    public String[][] board = new String[6][7];
+    boolean gameOver = false;
+    public String[][] board = new String[7][6];
 
     public static void main(String[] args) {
         new connectX();
     }
 
     connectX() {
-        System.out.print("Where would you like to go?\n\tA) Start game\n\tB) Instructions\n\tC) About\n\nAnswer: ");
+        System.out.print("Where would you like to go?\n\tA) Start game\n\tB) Instructions\n\tC) About\nAnswer: ");
 
         boolean validInput;
         do { //Do while loop to insure valid input.
@@ -50,13 +51,13 @@ public class connectX {
     }
 
     public void startGame() {
-        for (int y = 0; y < 7; y++) {
-            for (int x = 0; x < 6; x++) {
+        for (int y = 0; y < 6; y++) {
+            for (int x = 0; x < 7; x++) {
                 board[x][y] = "0";
             }
         }
 
-        boolean gameOver = false;
+        gameOver = false;
 
         while (!gameOver) {
             getPlayerOneInput();
@@ -72,19 +73,18 @@ public class connectX {
 
         do {
             System.out.println("Player 1, select a column: ");
-            choice = sc.nextInt() - 1;
+            choice = sc.nextInt();
 
-            if (choice > 6 || choice < 0) {
+            if (choice > 7 || choice < 1) {
                 System.out.println("Invalid input. Please enter a number from 1 to 7");
                 inputValid = false;
             } else {
+                choice--;
                 inputValid = true;
             }
         } while (!inputValid);
 
-        lineCheck(choice);
-
-        board[lineCheck(choice)][choice] = ANSI_RED + "1" + ANSI_RESET;
+        board[choice][lineCheck(choice)] = ANSI_RED + "1" + ANSI_RESET;
     }
 
     private void getPlayerTwoInput() {
@@ -103,13 +103,15 @@ public class connectX {
             }
         } while (!inputValid);
 
-        board[lineCheck(choice)][choice] = ANSI_YELLOW + "2" + ANSI_RESET;
+        board[choice][lineCheck(choice)] = ANSI_YELLOW + "2" + ANSI_RESET;
     }
 
     private void printBoard() {
         System.out.println("1  2  3  4  5  6  7\n--------------------");
-        for (int x = 0; x < 6; x++) {
-            for (int y = 0; y < 7; y++) {
+
+
+        for (int y = 0; y < 6; y++) {
+            for (int x = 0; x < 7; x++) {
 
                 System.out.print(board[x][y]);
                 System.out.print("  ");
@@ -120,9 +122,9 @@ public class connectX {
     }
 
     private int lineCheck(int choice) { //checks what value to place the
-        for (int x = 5; x >= 0; x--) {
-            if (board[x][choice].equals("0")) {
-                return x;
+        for (int y = 5; y >= 0; y--) {
+            if (board[choice][y].equals("0")) {
+                return y;
             }
         }
 
