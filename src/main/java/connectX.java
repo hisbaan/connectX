@@ -25,11 +25,13 @@ public class connectX {
     //Declaring + initializing variables.
     private Scanner sc = new Scanner(System.in);
     private boolean gameOver = false;
-    private int chainLength = 4;
-    private int boardXValue = 7;
-    private int boardYValue = 6;
+    private int chainLength;
+    private int boardXValue;
+    private int boardYValue;
 
-    private Tile[][] board = new Tile[boardXValue][boardYValue];
+    String boardHeader;
+
+    private Tile[][] board;
 
     public static void main(String[] args) {
         new connectX();
@@ -58,49 +60,42 @@ public class connectX {
         } catch (IOException e) {
 
         }
+        clear();
     }
 
     //Method that holds the code for the main menu.
     private void mainMenu() {
-        clear();
-        System.out.println("\n\nWhere would you like to go?\n\t[1] Start game\n\t[2] Instructions\n\t[3] About\n\t[4] Quit");
-        format();
         boolean validInput = true;
-        boolean exceptionThrown;
+
+
         do { //Do while loop to insure valid input.
-            int choice = 0;
-            do {
-                exceptionThrown = false;
-                try {
-                    choice = sc.nextInt();
-                    clear();
-                } catch (InputMismatchException e) {
-                    clear();
-                    System.out.println("\nInvalid input. Please enter an integer and between 1 and 4 and try again...\n\n");
-                    format();
-                    sc.next();
-                    exceptionThrown = true;
-                }
-            } while (exceptionThrown);
+
+//            clear();
+            System.out.println("\n\nWhere would you like to go?\n\t[1] Start game\n\t[2] Instructions\n\t[3] About\n\t[4] Quit");
+            format();
+
+            String choice = sc.nextLine();
+            clear();
+
             switch (choice) { //Switch on input to get the user's intentions.
-                case 1:
+                case "1":
                     validInput = true;
+                    selectSize();
                     startGame();
                     break;
-                case 2:
+                case "2":
                     validInput = true;
                     instructions();
                     break;
-                case 3:
+                case "3":
                     validInput = true;
                     about();
                     break;
-                case 4:
+                case "4":
                     quit();
                     break;
                 default:
-                    clear();
-                    System.out.println("\nInvalid input. Please try again...\n\n");
+                    System.out.println("\nInvalid input. Please enter a number between 1 and 4...\n\n");
                     format();
                     validInput = false;
                     break;
@@ -108,11 +103,70 @@ public class connectX {
         } while (!validInput);
     }
 
+
+    private void selectSize() {
+        boolean inputValid = true;
+
+        do {
+            clear();
+            System.out.println("What game-mode would you like to play?\n\t[1] Traditional\n\t[2] 10 X 7\n\t[3] 10 X 10\n\t[4] 5-in-a-row");
+            format();
+
+            String choice = sc.nextLine();
+            clear();
+
+            switch (choice) {
+                case "1":
+                    boardXValue = 7;
+                    boardYValue = 6;
+                    chainLength = 4;
+                    inputValid = true;
+                    break;
+                case "2":
+                    boardXValue = 10;
+                    boardYValue = 7;
+                    chainLength = 4;
+                    inputValid = true;
+                    break;
+                case "3":
+                    boardXValue = 10;
+                    boardYValue = 10;
+                    chainLength = 4;
+                    inputValid = true;
+                    break;
+                case "4":
+                    boardXValue = 9;
+                    boardYValue = 6;
+                    chainLength = 5;
+                    inputValid = true;
+                    break;
+                default:
+                    System.out.println("Invalid input, please enter a number between 1 and 4...");
+                    inputValid = false;
+                    break;
+
+            }
+        } while (!inputValid);
+
+        board = new Tile[boardXValue][boardYValue];
+        boardHeader = "\n\n";
+
+        for(int i = 1; i < boardXValue + 1; i++) {
+            boardHeader += "" + i + "  ";
+        }
+        boardHeader += "\n";
+        for(int i = 0; i < boardXValue; i++) {
+            boardHeader += "---";
+        }
+        boardHeader = boardHeader.substring(0, boardHeader.length() - 2);
+    }
+
     //Method to run the sequence of code that starts the game.
     private void startGame() {
+        counter = 0;
         //For loop that sets all indexes to "0" so the game starts correctly.
-        for (int y = 0; y < 6; y++) {
-            for (int x = 0; x < 7; x++) {
+        for (int y = 0; y < boardYValue; y++) {
+            for (int x = 0; x < boardXValue; x++) {
                 board[x][y] = new Tile();
                 board[x][y].player = 0;
                 board[x][y].representation = "0";
@@ -146,6 +200,7 @@ public class connectX {
     private void winCheck() {
         if (checkWinCondition() == 1) {
             gameOver = true;
+            clear();
             printBoard();
             System.out.println(ANSI_RED + "\nPLAYER 1 WINS!" + ANSI_RESET);
             System.out.println("\n\nPress Enter/Return to continue:");
@@ -158,6 +213,7 @@ public class connectX {
             clear();
         } else if (checkWinCondition() == 2) {
             gameOver = true;
+            clear();
             printBoard();
             System.out.println(ANSI_YELLOW + "\nPLAYER 2 WINS!" + ANSI_RESET);
             System.out.println("\n\nPress Enter/Return to continue:");
@@ -200,29 +256,28 @@ public class connectX {
                     clear();
                 } catch (InputMismatchException e) {
                     clear();
-                    System.out.println("\nInvalid input. Please enter an INTEGER from 1 to 7");
+                    System.out.println("\nInvalid input. Please enter an INTEGER from 1 to " + boardYValue + "...\n");
                     printBoard();
                     sc.next();
                     exceptionThrown = true;
                 }
             } while (exceptionThrown);
 
-            if (choice <= 7 && choice >= 1) {
+            if (choice <= boardXValue && choice >= 1) {
                 choice--;
                 inputValid = true;
 
                 if (lineCheck(choice) == -1) {
                     columnFull = true;
                     clear();
-                    System.out.println("Column is full, please try another column...");
+                    System.out.println("\nColumn is full, please try another column...\n");
                     printBoard();
-                    format();
                 } else {
                     columnFull = false;
                 }
             } else {
                 clear();
-                System.out.println("\nInvalid input. Please enter a number from 1 to 7");
+                System.out.println("\nInvalid input. Please enter a number from 1 to " + boardYValue + "...\n");
                 printBoard();
                 inputValid = false;
             }
@@ -238,10 +293,10 @@ public class connectX {
 
     //Method that prints the board.
     private void printBoard() {
-        System.out.println("\n\n1  2  3  4  5  6  7\n--------------------");
+        System.out.println(boardHeader);
 
-        for (int y = 0; y < 6; y++) {
-            for (int x = 0; x < 7; x++) {
+        for (int y = 0; y < boardYValue; y++) {
+            for (int x = 0; x < boardXValue; x++) {
                 System.out.print(board[x][y].representation);
                 System.out.print("  ");
             }
@@ -494,8 +549,7 @@ public class connectX {
 
     private void quit() {
         clear();
-        System.out.println("Thank you for playing!");
-        format();
+        System.out.println("Thank you for playing!\n\n");
         try {
             Thread.sleep(250);
         } catch (InterruptedException e) {
