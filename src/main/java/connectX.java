@@ -16,6 +16,7 @@ public class connectX {
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_YELLOW = "\u001B[33m";
+    private static final String ANSI_CYAN = "\u001b[36m";
 
     //Coloured characters.
     private static final String redCharacter = ANSI_RED + "1" + ANSI_RESET;
@@ -145,6 +146,7 @@ public class connectX {
     private void winCheck() {
         if (checkWinCondition() == 1) {
             gameOver = true;
+            printBoard();
             System.out.println(ANSI_RED + "\nPLAYER 1 WINS!" + ANSI_RESET);
             System.out.println("\n\nPress Enter/Return to continue:");
             format();
@@ -156,6 +158,7 @@ public class connectX {
             clear();
         } else if (checkWinCondition() == 2) {
             gameOver = true;
+            printBoard();
             System.out.println(ANSI_YELLOW + "\nPLAYER 2 WINS!" + ANSI_RESET);
             System.out.println("\n\nPress Enter/Return to continue:");
             format();
@@ -288,6 +291,9 @@ public class connectX {
                         }
 
                         if (tilesInARow == chainLength - 1) { //If the amount of tiles in a row matches the amount needed to win, return an int indicating which player wins.
+                            for (int i = 0; i < chainLength; i++) {
+                                board[x + i][y].representation = "" + ANSI_CYAN + board[x][y].player + ANSI_RESET; //TODO come back
+                            }
                             return 1;
                         }
                     }
@@ -306,6 +312,9 @@ public class connectX {
                         }
 
                         if (tilesInARow == chainLength - 1) {
+                            for (int i = 0; i < chainLength; i++) {
+                                board[x][y + i].representation = "" + ANSI_CYAN + board[x][y].player + ANSI_RESET; //TODO come back
+                            }
                             return 1;
                         }
                     }
@@ -324,6 +333,9 @@ public class connectX {
                         }
 
                         if (tilesInARow == chainLength - 1) {
+                            for (int i = 0; i < chainLength; i++) {
+                                board[x + i][y + i].representation = "" + ANSI_CYAN + board[x][y].player + ANSI_RESET; //TODO come back
+                            }
                             return 1;
                         }
                     }
@@ -342,6 +354,9 @@ public class connectX {
                         }
 
                         if (tilesInARow == chainLength - 1) {
+                            for (int i = 0; i < chainLength; i++) {
+                                board[x + i][y - i].representation = "" + ANSI_CYAN + board[x][y].player + ANSI_RESET; //TODO come back
+                            }
                             return 1;
                         }
                     }
@@ -364,6 +379,9 @@ public class connectX {
                         }
 
                         if (tilesInARow == chainLength - 1) {
+                            for (int i = 0; i < chainLength; i++) {
+                                board[x + i][y].representation = "" + ANSI_CYAN + board[x][y].player + ANSI_RESET; //TODO come back
+                            }
                             return 2;
                         }
                     }
@@ -382,6 +400,9 @@ public class connectX {
                         }
 
                         if (tilesInARow == chainLength - 1) {
+                            for (int i = 0; i < chainLength; i++) {
+                                board[x][y + i].representation = "" + ANSI_CYAN + board[x][y].player + ANSI_RESET; //TODO come back
+                            }
                             return 2;
                         }
                     }
@@ -400,6 +421,9 @@ public class connectX {
                         }
 
                         if (tilesInARow == chainLength - 1) {
+                            for (int i = 0; i < chainLength; i++) {
+                                board[x + i][y + i].representation = "" + ANSI_CYAN + board[x][y].player + ANSI_RESET; //TODO come back
+                            }
                             return 2;
                         }
                     }
@@ -419,6 +443,9 @@ public class connectX {
                         }
 
                         if (tilesInARow == chainLength - 1) {
+                            for (int i = 0; i < chainLength; i++) {
+                                board[x + i][y - i].representation = "" + ANSI_CYAN + board[x][y].player + ANSI_RESET; //TODO come back
+                            }
                             return 2;
                         }
                     }
