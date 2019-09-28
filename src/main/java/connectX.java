@@ -4,6 +4,10 @@ Created: 13/09/2019
 Author: Hisbaan Noorani
 */
 
+import com.sun.tools.javac.code.Scope;
+
+import java.io.IOException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class connectX {
@@ -38,7 +42,26 @@ public class connectX {
 
     //Method that holds the code for the main menu.
     private void mainMenu() {
-        System.out.println("Where would you like to go?\n\t[1] Start game\n\t[2] Instructions\n\t[3] About\n\t[4] Quit");
+        System.out.println("\n" +
+                " ██████╗ ██████╗ ███╗   ██╗███╗   ██╗███████╗ ██████╗████████╗    ██╗  ██╗\n" +
+                "██╔════╝██╔═══██╗████╗  ██║████╗  ██║██╔════╝██╔════╝╚══██╔══╝    ██║  ██║\n" +
+                "██║     ██║   ██║██╔██╗ ██║██╔██╗ ██║█████╗  ██║        ██║       ███████║\n" +
+                "██║     ██║   ██║██║╚██╗██║██║╚██╗██║██╔══╝  ██║        ██║       ╚════██║\n" +
+                "╚██████╗╚██████╔╝██║ ╚████║██║ ╚████║███████╗╚██████╗   ██║            ██║\n" +
+                " ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═╝            ╚═╝\n" +
+                "                                                                          \n");
+
+        System.out.println("Press Enter/Return to continue:");
+        try {
+            System.in.read();
+        } catch (IOException e) {
+
+        }
+        format();
+
+        clear();
+        System.out.println("\n\nWhere would you like to go?\n\t[1] Start game\n\t[2] Instructions\n\t[3] About\n\t[4] Quit");
+        format();
         boolean validInput = true;
         boolean exceptionThrown;
         do { //Do while loop to insure valid input.
@@ -46,9 +69,13 @@ public class connectX {
             do {
                 exceptionThrown = false;
                 try {
-                    choice = Integer.parseInt(sc.nextLine());
-                } catch (Exception e) {
+                    choice = sc.nextInt();
+                    clear();
+                } catch (InputMismatchException e) {
+                    clear();
                     System.out.println("\nInvalid input. Please enter an integer and between 1 and 4 and try again...\n\n");
+                    format();
+                    sc.next();
                     exceptionThrown = true;
                 }
             } while (exceptionThrown);
@@ -69,13 +96,16 @@ public class connectX {
                     quit();
                     break;
                 default:
+                    clear();
                     System.out.println("\nInvalid input. Please try again...\n\n");
+                    format();
                     validInput = false;
                     break;
             }
         } while (!validInput);
     }
 
+    //Method to run the sequence of code that starts the game.
     private void startGame() {
         //For loop that sets all indexes to "0" so the game starts correctly.
         for (int y = 0; y < 6; y++) {
@@ -89,18 +119,22 @@ public class connectX {
         //While loop that sets the sequence of events for the game (i.e. printing --> checking for win --> getting player one input --> printing --> getting player two input --> repeat)
         while (!gameOver) {
             printBoard();
+            checkFull();
 
             winCheck();
             if (gameOver) break;
 
-            getPlayerOneInput();
+            getPlayerInput();
             printBoard();
+            checkFull();
 
             winCheck();
             if (gameOver) break;
 
-            getPlayerTwoInput();
+            getPlayerInput();
         }
+
+        mainMenu();
 
         //TODO go back to the main menu when the game ends.
     }
@@ -110,52 +144,83 @@ public class connectX {
         if (checkWinCondition() == 1) {
             gameOver = true;
             System.out.println(ANSI_RED + "\nPLAYER 1 WINS!" + ANSI_RESET);
+            System.out.println("\n\nPress Enter/Return to continue:");
+            try {
+                System.in.read();
+            } catch (IOException e) {
+
+            }
+            format();
         } else if (checkWinCondition() == 2) {
             gameOver = true;
-            System.out.println(ANSI_YELLOW + "\nPLAYER 2 WINS" + ANSI_RESET);
+            System.out.println(ANSI_YELLOW + "\nPLAYER 2 WINS!" + ANSI_RESET);
+            System.out.println("\n\nPress Enter/Return to continue:");
+            try {
+                System.in.read();
+            } catch (IOException e) {
+
+            }
+            format();
         }
     }
 
-    //TODO make inputting a string/char not possible with try catches
-    //Method that gets the first player's input.
-    private void getPlayerOneInput() {
+    private int counter = 0;
+
+    private void getPlayerInput() {
+        String characterString;
         boolean inputValid;
-        int choice;
+        boolean exceptionThrown;
+        boolean columnFull = false;
+        int choice = 0;
+
+        counter++;
+        if (counter % 2 == 0) {
+            characterString = yellowCharacter;
+        } else {
+            characterString = redCharacter;
+        }
 
         do {
-            System.out.println("\nPlayer " + redCharacter + ", select a column: ");
-            choice = sc.nextInt();
+            do {
+                System.out.println("\nPlayer " + characterString + ", select a column: ");
+                format();
+                exceptionThrown = false;
+                try {
+                    choice = sc.nextInt();
+                    clear();
+                } catch (InputMismatchException e) {
+                    clear();
+                    System.out.println("\nInvalid input. Please enter an INTEGER from 1 to 7");
+                    printBoard();
+                    sc.next();
+                    exceptionThrown = true;
+                }
+            } while (exceptionThrown);
 
-            if (choice > 7 || choice < 1) {
-                System.out.println("\nInvalid input. Please enter a number from 1 to 7");
-                inputValid = false;
-            } else {
+            if (choice <= 7 && choice >= 1) {
                 choice--;
                 inputValid = true;
-            }
-        } while (!inputValid);
 
-        board[choice][lineCheck(choice)] = redCharacter;
-    }
-
-    //Method that gets the second player's input.
-    private void getPlayerTwoInput() {
-        boolean inputValid;
-        int choice;
-
-        do {
-            System.out.println("\nPlayer " + yellowCharacter + ", select a column: ");
-
-            choice = sc.nextInt() - 1;
-            if (choice > 6 || choice < 0) {
-                System.out.println("\nInvalid input. Please enter a number from 1 to 7");
-                inputValid = false;
+                if (lineCheck(choice) == -1) {
+                    columnFull = true;
+                    clear();
+                    System.out.println("Column is full, please try another column...");
+                    printBoard();
+                    format();
+                } else {
+                    columnFull = false;
+                }
             } else {
-                inputValid = true;
+                clear();
+                System.out.println("\nInvalid input. Please enter a number from 1 to 7");
+                printBoard();
+                inputValid = false;
             }
-        } while (!inputValid);
 
-        board[choice][lineCheck(choice)] = yellowCharacter;
+        } while (!inputValid || columnFull);
+
+        board[choice][lineCheck(choice)] = characterString;
+
     }
 
     //Method that prints the board.
@@ -173,7 +238,6 @@ public class connectX {
 
     }
 
-    //TODO make a check for if the grid fills up by checking for -1 as a return.
     private int lineCheck(int choice) { //Checks what value x value to place the tile at.
         for (int y = 5; y >= 0; y--) {
             if (board[choice][y].equals("0")) {
@@ -356,6 +420,34 @@ public class connectX {
         return 0;
     }
 
+    private void checkFull() {
+        boolean full = true;
+
+        for (int x = 0; x < boardXValue; x++) {
+            if (board[x][0].equals("0")) {
+                full = false;
+            }
+        }
+
+        if (full) {
+            System.out.println("TIE!\nThe board is full.");
+            format();
+            gameOver = true;
+        }
+    }
+
+    private void clear() {
+        for (int i = 0; i < 50; i++) {
+            System.out.println();
+        }
+    }
+
+    private void format() {
+        for (int i = 0; i < 10; i++) {
+            System.out.println();
+        }
+    }
+
     private void instructions() {
         //TODO output instructions here.
     }
@@ -365,6 +457,17 @@ public class connectX {
     }
 
     private void quit() {
-        //TODO quit the game here.
+        clear();
+        System.out.println("Thank you for playing!");
+        format();
+        try {
+            Thread.sleep(250);
+        } catch (InterruptedException e) {
+
+        }
+        System.out.println("\nGood Bye!");
+        format();
+        sc.close();
+        System.exit(0);
     }
 }
