@@ -4,8 +4,6 @@ Created: 13/09/2019
 Author: Hisbaan Noorani
 */
 
-import com.sun.tools.javac.code.Scope;
-
 import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -30,18 +28,19 @@ public class connectX {
     private int boardXValue = 7;
     private int boardYValue = 6;
 
-    private String[][] board = new String[boardXValue][boardYValue];
+    private Tile[][] board = new Tile[boardXValue][boardYValue];
 
     public static void main(String[] args) {
         new connectX();
     }
 
     private connectX() {
+        printFiglet();
         mainMenu();
     }
 
-    //Method that holds the code for the main menu.
-    private void mainMenu() {
+    private void printFiglet() {
+        clear();
         System.out.println("\n" +
                 " ██████╗ ██████╗ ███╗   ██╗███╗   ██╗███████╗ ██████╗████████╗    ██╗  ██╗\n" +
                 "██╔════╝██╔═══██╗████╗  ██║████╗  ██║██╔════╝██╔════╝╚══██╔══╝    ██║  ██║\n" +
@@ -52,13 +51,16 @@ public class connectX {
                 "                                                                          \n");
 
         System.out.println("Press Enter/Return to continue:");
+        format();
         try {
             System.in.read();
         } catch (IOException e) {
 
         }
-        format();
+    }
 
+    //Method that holds the code for the main menu.
+    private void mainMenu() {
         clear();
         System.out.println("\n\nWhere would you like to go?\n\t[1] Start game\n\t[2] Instructions\n\t[3] About\n\t[4] Quit");
         format();
@@ -110,7 +112,9 @@ public class connectX {
         //For loop that sets all indexes to "0" so the game starts correctly.
         for (int y = 0; y < 6; y++) {
             for (int x = 0; x < 7; x++) {
-                board[x][y] = "0";
+                board[x][y] = new Tile();
+                board[x][y].player = 0;
+                board[x][y].representation = "0";
             }
         }
 
@@ -135,8 +139,6 @@ public class connectX {
         }
 
         mainMenu();
-
-        //TODO go back to the main menu when the game ends.
     }
 
     //Method that checks for a win and prints a statement accordingly.
@@ -145,44 +147,49 @@ public class connectX {
             gameOver = true;
             System.out.println(ANSI_RED + "\nPLAYER 1 WINS!" + ANSI_RESET);
             System.out.println("\n\nPress Enter/Return to continue:");
+            format();
             try {
                 System.in.read();
             } catch (IOException e) {
 
             }
-            format();
+            clear();
         } else if (checkWinCondition() == 2) {
             gameOver = true;
             System.out.println(ANSI_YELLOW + "\nPLAYER 2 WINS!" + ANSI_RESET);
             System.out.println("\n\nPress Enter/Return to continue:");
+            format();
             try {
                 System.in.read();
             } catch (IOException e) {
 
             }
-            format();
+            clear();
         }
     }
 
     private int counter = 0;
 
     private void getPlayerInput() {
-        String characterString;
+        String playerCharacter;
         boolean inputValid;
         boolean exceptionThrown;
         boolean columnFull = false;
         int choice = 0;
+        int playerNumber;
 
         counter++;
         if (counter % 2 == 0) {
-            characterString = yellowCharacter;
+            playerCharacter = yellowCharacter;
+            playerNumber = 2;
         } else {
-            characterString = redCharacter;
+            playerCharacter = redCharacter;
+            playerNumber = 1;
         }
 
         do {
             do {
-                System.out.println("\nPlayer " + characterString + ", select a column: ");
+                System.out.println("\nPlayer " + playerCharacter + ", select a column: ");
                 format();
                 exceptionThrown = false;
                 try {
@@ -219,7 +226,10 @@ public class connectX {
 
         } while (!inputValid || columnFull);
 
-        board[choice][lineCheck(choice)] = characterString;
+        int boardYValue = lineCheck(choice);
+
+        board[choice][boardYValue].player = playerNumber;
+        board[choice][boardYValue].representation = playerCharacter;
 
     }
 
@@ -229,8 +239,7 @@ public class connectX {
 
         for (int y = 0; y < 6; y++) {
             for (int x = 0; x < 7; x++) {
-
-                System.out.print(board[x][y]);
+                System.out.print(board[x][y].representation);
                 System.out.print("  ");
             }
             System.out.println();
@@ -240,7 +249,7 @@ public class connectX {
 
     private int lineCheck(int choice) { //Checks what value x value to place the tile at.
         for (int y = 5; y >= 0; y--) {
-            if (board[choice][y].equals("0")) {
+            if (board[choice][y].player == 0) {
                 return y;
             }
         }
@@ -257,7 +266,7 @@ public class connectX {
         //For loop to iterate through all the indices in the 2D array.
         for (int y = 0; y < 6; y++) {
             for (int x = 0; x < 7; x++) {
-                if (board[x][y].equals(redCharacter)) { //Checks if the specific index is a red tile.
+                if (board[x][y].player == 1) { //Checks if the specific index is a red tile.
                     //Check right, down, diagonal up, diagonal down for red.
 
                     //Resetting variables.
@@ -269,7 +278,7 @@ public class connectX {
                     //For loop to where z acts as a counter to check the next tile in line.
                     for (int z = 1; keepChecking; z++) {
                         try {
-                            if (board[x + z][y].equals(redCharacter)) { //If the next index is also a red tile, the tilesInARow variable is incremented by 1.
+                            if (board[x + z][y].player == 1) { //If the next index is also a red tile, the tilesInARow variable is incremented by 1.
                                 tilesInARow++;
                             } else { //Else, the keep checking variable is set to false, breaking the loop.
                                 keepChecking = false;
@@ -287,7 +296,7 @@ public class connectX {
                     keepChecking = true;
                     for (int z = 1; keepChecking; z++) {
                         try {
-                            if (board[x][y + z].equals(redCharacter)) {
+                            if (board[x][y + z].player == 1) {
                                 tilesInARow++;
                             } else {
                                 keepChecking = false;
@@ -305,7 +314,7 @@ public class connectX {
                     keepChecking = true;
                     for (int z = 1; keepChecking; z++) {
                         try {
-                            if (board[x + z][y + z].equals(redCharacter)) {
+                            if (board[x + z][y + z].player == 1) {
                                 tilesInARow++;
                             } else {
                                 keepChecking = false;
@@ -323,7 +332,7 @@ public class connectX {
                     keepChecking = true;
                     for (int z = 1; keepChecking; z++) {
                         try {
-                            if (board[x + z][y - z].equals(redCharacter)) {
+                            if (board[x + z][y - z].player == 1) {
                                 tilesInARow++;
                             } else {
                                 keepChecking = false;
@@ -338,14 +347,14 @@ public class connectX {
                     }
                 }
 
-                if (board[x][y].equals(yellowCharacter)) {
+                if (board[x][y].player == 2) {
                     //check right, down, diagonal up, diagonal down for yellow
 
                     tilesInARow = 0;
                     keepChecking = true;
                     for (int z = 1; keepChecking; z++) {
                         try {
-                            if (board[x + z][y].equals(yellowCharacter)) {
+                            if (board[x + z][y].player == 2) {
                                 tilesInARow++;
                             } else {
                                 keepChecking = false;
@@ -363,7 +372,7 @@ public class connectX {
                     keepChecking = true;
                     for (int z = 1; keepChecking; z++) {
                         try {
-                            if (board[x][y + z].equals(yellowCharacter)) {
+                            if (board[x][y + z].player == 2) {
                                 tilesInARow++;
                             } else {
                                 keepChecking = false;
@@ -381,7 +390,7 @@ public class connectX {
                     keepChecking = true;
                     for (int z = 1; keepChecking; z++) {
                         try {
-                            if (board[x + z][y + z].equals(yellowCharacter)) {
+                            if (board[x + z][y + z].player == 2) {
                                 tilesInARow++;
                             } else {
                                 keepChecking = false;
@@ -399,7 +408,7 @@ public class connectX {
                     keepChecking = true;
                     for (int z = 1; keepChecking; z++) {
                         try {
-                            if (board[x + z][y - z].equals(yellowCharacter)) {
+                            if (board[x + z][y - z].player == 2) {
                                 tilesInARow++;
 
                             } else {
@@ -424,7 +433,7 @@ public class connectX {
         boolean full = true;
 
         for (int x = 0; x < boardXValue; x++) {
-            if (board[x][0].equals("0")) {
+            if (board[x][0].player == 0) {
                 full = false;
             }
         }
