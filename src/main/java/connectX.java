@@ -272,7 +272,7 @@ public class connectX {
                     clear();
                 } catch (InputMismatchException e) { //If input is not an integer, this block of code is triggered, asking the user to try again.
                     clear();
-                    System.out.println("\nInvalid input. Please enter an INTEGER from 1 to " + boardYValue + "...\n");
+                    System.out.println("\nInvalid input. Please enter an INTEGER from 1 to " + boardXValue + "...\n");
                     printBoard();
                     sc.next();
                     exceptionThrown = true;
@@ -295,7 +295,7 @@ public class connectX {
                 }
             } else {
                 clear();
-                System.out.println("\nInvalid input. Please enter a number from 1 to " + boardYValue + "...\n");
+                System.out.println("\nInvalid input. Please enter a number from 1 to " + boardXValue + "...\n");
                 printBoard();
                 inputValid = false;
             }
